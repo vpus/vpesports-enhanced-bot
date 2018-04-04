@@ -3,7 +3,7 @@ local botTeam = npcBot:GetTeam()
 
 function GetDesire()
 	if npcBot.secretShop then
-		return 6
+		return 1
 	end
 	
 	return 0
@@ -31,13 +31,13 @@ function Think()
 	local secretDist = npcBot:DistanceFromSecretShop()
 	
 	if secretDist > 0 then
-		if boots ~= nil and not npcBot:IsChanneling() then
+		if boots ~= nil and not npcBot:IsChanneling() and secretDist > 2000 then
 			if boots:IsFullyCastable() then
 				npcBot:Action_UseAbilityOnLocation(boots, secretShopLoc)
 			elseif not boots:IsCooldownReady() and rearm:IsOwnersManaEnough() then
 				npcBot:Action_UseAbility(rearm)
 			end
-		elseif not npcBot:IsChanneling() then
+		elseif (not npcBot:IsChanneling() and secretDist < 2000) or boots == nil then
 			npcBot:Action_MoveToLocation(secretShopLoc)
 		end
 	else

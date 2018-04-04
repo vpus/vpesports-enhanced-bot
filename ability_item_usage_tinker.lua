@@ -5,14 +5,12 @@ require(GetScriptDirectory().."/UtilityFunctions")
 local npcBot  = GetBot()
 local botTeam = GetTeam()
 
+function BuybackUsageThink()
+end
+
 function AbilityLevelUpThink()
     local skillsToLevel = build["skills"]
---    if npcBot:GetAbilityPoints() < 1 or (GetGameState() ~= GAME_STATE_PRE_GAME 
---    	and GetGameState() ~= GAME_STATE_GAME_IN_PROGRESS) then
---        return
---    end
-    if npcBot:GetAbilityPoints() > 0 and skillsToLevel[1] ~= "-1" 
-    	and skillsToLevel[1] ~= nil then
+    if npcBot:GetAbilityPoints() > 0 and skillsToLevel[1] ~= nil then
       	npcBot:ActionImmediate_LevelAbility(skillsToLevel[1])
       	table.remove(skillsToLevel, 1)
     end
@@ -45,10 +43,10 @@ function AbilityUsageThink()
 	local creepLaneMidDir = _G.GetLaneCreepStatus(LANE_MID, TEAM_DIRE)
 	local creepLaneBotDir = _G.GetLaneCreepStatus(LANE_BOT, TEAM_DIRE)
 	
-	local laser   = npcBot:GetAbilityByName("tinker_laser");
-	local missile = npcBot:GetAbilityByName("tinker_heat_seeking_missile");
-	local march   = npcBot:GetAbilityByName("tinker_march_of_the_machines");
-	local rearm   = npcBot:GetAbilityByName("tinker_rearm");
+	local laser   = npcBot:GetAbilityByName("tinker_laser")
+	local missile = npcBot:GetAbilityByName("tinker_heat_seeking_missile")
+	local march   = npcBot:GetAbilityByName("tinker_march_of_the_machines")
+	local rearm   = npcBot:GetAbilityByName("tinker_rearm")
 	
 	local nearbyEnemies  = npcBot:GetNearbyHeroes(650, true, BOT_MODE_NONE)
 
@@ -186,7 +184,7 @@ function ItemUsageThink()
 	if botHP/botMaxHP < 0.5 and not npcBot:IsChanneling() then
 		if salve ~= nil and not npcBot:HasModifier("modifier_flask_healing") then
 			npcBot:Action_UseAbilityOnEntity(salve, npcBot)
-		elseif bottle ~= nil and bottle:GetCurrentCharges() > 0 then
+		elseif bottle ~= nil and bottle:GetCurrentCharges() > 0 and npcBot:DistanceFromFountain() ~= 0 then
 			npcBot:Action_UseAbility(bottle)
 		elseif tango ~= nil and #nearbyTrees > 0 and not npcBot:HasModifier("modifier_tango_heal") then
 			npcBot:Action_UseAbilityOnTree(tango, nearbyTrees[1])
@@ -202,7 +200,7 @@ function ItemUsageThink()
 	end
 	
 	-- Use bottle if mana is low
-	if bottleLoc ~= nil then
+	if bottleLoc ~= nil and not npcBot:IsChanneling() then
 		bottle     = npcBot:GetItemInSlot(bottleLoc)
 		bottleSlot = npcBot:GetItemSlotType(bottleLoc)
 		
@@ -212,7 +210,4 @@ function ItemUsageThink()
 			end
 		end
 	end
-	
-	-- Move usable items to inventory
-	
 end

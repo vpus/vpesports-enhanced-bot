@@ -5,6 +5,7 @@ local purchase = require(GetScriptDirectory() .. "/item_build_tinker");
 local itemsPurchase = purchase["items"]
 local boughtClarity = false
 local boughtSalve   = false
+local clarityCount  = 0
 
 function ItemPurchaseThink()
 --	if GetGameState() ~= GAME_STATE_PRE_GAME and GetGameState() ~= GAME_STATE_GAME_IN_PROGRESS then
@@ -48,10 +49,11 @@ function ItemPurchaseThink()
 
 	if boots == nil then
     	if (botMana < npcBot:GetAbilityByName("tinker_march_of_the_machines"):GetManaCost()) and npcBot:IsAlive() then
-    		if not boughtClarity and (bottle == nil or bottle:GetCurrentCharges() == 0) and clarity == nil and not npcBot:HasModifier("modifier_clarity_potion") and npcBot:GetItemSlotType(bootsLoc) == ITEM_SLOT_TYPE_INVALID then
+    		if clarityCount < 4 and not boughtClarity and (bottle == nil or bottle:GetCurrentCharges() == 0) and clarity == nil and not npcBot:HasModifier("modifier_clarity_potion") and npcBot:GetItemSlotType(bootsLoc) == ITEM_SLOT_TYPE_INVALID then
         		local result = npcBot:ActionImmediate_PurchaseItem("item_clarity")
         		if result == PURCHASE_ITEM_SUCCESS then
         			boughtClarity = true
+        			clarityCount = clarityCount + 1
         		end
         	end
         end
