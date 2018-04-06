@@ -215,44 +215,6 @@ function ItemUsageThink()
 	end
 end
 
--- Logic for all Item Usage behavior
---function ItemUsageThink()
---	----------------------------------------------------------------------------
---	-- Stats
---	local currMana = npcBot:GetMana()
---	local maxMana  = npcBot:GetMaxMana()
---	local currHP   = npcBot:GetHealth()
---	local maxHP    = npcBot:GetMaxHealth()
---	local manaDiff = currMana/maxMana
---
---	-- Surroundings
---	local nearbyEnemies = npcBot:GetNearbyHeroes(1000, true, BOT_MODE_NONE)
---	local nearbyCreeps  = npcBot:GetNearbyCreeps(1000, true)
---	local nearbyAllies  = npcBot:GetNearbyHeroes(1000, false, BOT_MODE_NONE)
---	----------------------------------------------------------------------------
---
---	local currAction = npcBot:GetCurrentActionType()
---	local queue      = npcBot:NumQueuedActions()
---	-- Consider using Soul Ring
---	if manaDiff < 0.5 and currHP > 300 then
---		if #nearbyEnemies == 0 and #nearbyCreeps == 0 and currAction ~= _G.actions["use_item"] and queue == 0 then
---			_G.useSoulRing(bot)
---		else
---			if not _G.useItem(bot, "item_clarity", bot, "modifier_clarity_potion") then
---				-- TODO: find another way to get mana
---			end
---		end
---	end
---	if (currHP / maxHP) < 0.75 and not npcBot:HasModifier("modifier_tango_heal") then
---		local nearbyTrees = npcBot:GetNearbyTrees(1000)
---		if nearbyTrees ~= nil and #nearbyTrees > 0 then
---			useItem(bot, "item_tango", GetTreeLocation(nearbyTrees[1]), "modifier_tango_heal")
---		end
---	elseif (currHP / maxHP) < 0.5 and not npcBot:HasModifier("modifier_flask_healing") then
---		useItem(bot, "item_flask", bot, "modifier_flask_healing")
---	end
---end
-
 function getNearestCreep()
 	local nearbyCreeps =  npcBot:GetNearbyCreeps(500, true)
 	if #nearbyCreeps > 0 then
