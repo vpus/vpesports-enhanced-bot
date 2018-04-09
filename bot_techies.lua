@@ -3,6 +3,7 @@ require(GetScriptDirectory().."/UtilityFunctions");
 
 local npcBot  = GetBot();
 local botTeam = GetTeam();
+npcBot.other_mode = nil
 
 -- Keep a reference to each mine
 local remoteMines = {};

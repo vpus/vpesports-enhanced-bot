@@ -1,13 +1,13 @@
 require(GetScriptDirectory().."/UtilityData")
 require(GetScriptDirectory().."/UtilityFunctions")
 
-local enemyLastLocations = {}
-local npcBot     = GetBot()
-local botTeam = GetTeam()
+local npcBot      = GetBot()
+local botTeam     = GetTeam()
 local mineCounter = 1
-local targetSet = false
+local targetSet   = false
 
 function OnStart()
+	npcBot.other_mode = BOT_MODE_ROAM
 	npcBot:Action_ClearActions(true)
 end
 
@@ -17,7 +17,7 @@ end
 
 function GetDesire()
 	local botLevel = npcBot:GetLevel()
-	local time = DotaTime()
+	local time     = DotaTime()
 	
 	if time < 0 or botLevel >= 6 then
 		return _G.desires[6]
@@ -63,7 +63,7 @@ function Think()
 		
 		-- If all enemy towers are destroyed, only plant around enemy base
 		elseif #enemyTowersTop == 0 and #enemyTowersMid == 0 and #enemyTowersBot == 0 then
-			remoteLocSet = _G.dir_base_remote_locs
+			remoteLocSet = _G.dir_base_remote_locs_attack
 		-- If all allied towers in a lane are destroyed, alternate between roaming
 		-- and planting around allied base
 		else
@@ -106,6 +106,9 @@ function Think()
 
 		-- Set the appropriate remote mine
 		if #remoteLocSet > 0 then
+			if mineCounter >= table.getn(remoteLocSet) then
+				mineCounter = 1
+			end
 			if RemoteMine:IsFullyCastable() and action ~= _G.actions["use_ability"] then
 				if mineCounter >= table.getn(remoteLocSet) then
 					mineCounter = 1
@@ -114,6 +117,8 @@ function Think()
 				local remoteLoc = remoteLocSet[mineCounter]
 				npcBot:Action_UseAbilityOnLocation(RemoteMine, remoteLoc)
 				mineCounter = mineCounter + 1
+			elseif GetUnitToLocationDistance(npcBot, remoteLocSet[mineCounter]) > 1000 and action ~= BOT_ACTION_TYPE_MOVE_TO then
+				npcBot:Action_MoveToLocation(remoteLocSet[mineCounter] + RandomVector(100))
 			end
 		end
 	end

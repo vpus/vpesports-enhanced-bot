@@ -2,8 +2,13 @@ local build = require(GetScriptDirectory().."/item_build_techies")
 require(GetScriptDirectory().."/UtilityData")
 require(GetScriptDirectory().."/UtilityFunctions")
 
-local npcBot     = GetBot()
+local npcBot  = GetBot()
 local botTeam = GetTeam()
+
+local mine   = npcBot:GetAbilityByName("techies_land_mines")
+local stasis = npcBot:GetAbilityByName("techies_stasis_trap")
+local blast  = npcBot:GetAbilityByName("techies_suicide")
+local remote = npcBot:GetAbilityByName("techies_remote_mines")
 
 function BuybackUsageThink()
 end
@@ -18,13 +23,6 @@ end
 
 -- Logic for all Ability Usage behavior
 function AbilityUsageThink()
-	----------------------------------------------------------------------------
-	-- Abilities
-	local ProximityMine = npcBot:GetAbilityByName("techies_land_mines")
-	local StasisTrap    = npcBot:GetAbilityByName("techies_stasis_trap")
-	local BlastOff      = npcBot:GetAbilityByName("techies_suicide")
-	local RemoteMine    = npcBot:GetAbilityByName("techies_remote_mines")
-
 	-- Stats
 	local currMana = npcBot:GetMana()
 	local maxMana  = npcBot:GetMaxMana()
@@ -39,15 +37,15 @@ function AbilityUsageThink()
 	----------------------------------------------------------------------------
 
 	-- Use Proximity Mines and Remote Mines
---	if RemoteMine:IsFullyCastable() and action ~= BOT_ACTION_TYPE_USE_ABILITY then
+--	if remote:IsFullyCastable() and action ~= BOT_ACTION_TYPE_USE_ABILITY then
 --		-- Find the closest Remote Mine location and drop one
 --		local distFromClosestLoc, closestLoc = getClosestLocation(npcBot)
 --
 --		if distFromClosestLoc <= 1000 then
---			npcBot:Action_UseAbilityOnLocation(RemoteMine,closestLoc)
+--			npcBot:Action_UseAbilityOnLocation(remote,closestLoc)
 --		end
 --	else
-	if ProximityMine:IsFullyCastable() and action ~= BOT_ACTION_TYPE_USE_ABILITY then 
+	if mine:IsFullyCastable() and action ~= BOT_ACTION_TYPE_USE_ABILITY then 
 		-- drop a proximity mine near a tree near creeps
 		local nearestCreep, nearestCreepDist = getNearestCreep()
 		local trees = npcBot:GetNearbyTrees(1000)
@@ -57,18 +55,19 @@ function AbilityUsageThink()
 			-- print ("DROPPING Proximity Mine at: "..treeLoc)
 			-- print(nearestCreepDist, trees[1])
 			if treeLoc[1] > -6800 then
-				npcBot:Action_UseAbilityOnLocation(ProximityMine, treeLoc)
+				npcBot:Action_UseAbilityOnLocation(mine, treeLoc)
 			end
+		end
+	end
+	
+	if npcBot:GetActiveMode() == BOT_MODE_RETREAT and npcBot.other_mode == BOT_MODE_ROAM then
+		if stasis:IsFullyCastable() and action ~= BOT_ACTION_TYPE_USE_ABILITY then
+			npcBot:Action_UseAbilityOnLocation(stasis, npcBot:GetLocation() + RandomVector(50))
 		end
 	end
 end
 
 function ItemUsageThink()
-	local ProximityMine = npcBot:GetAbilityByName("techies_land_mines")
-	local StasisTrap    = npcBot:GetAbilityByName("techies_stasis_trap")
-	local BlastOff      = npcBot:GetAbilityByName("techies_suicide")
-	local RemoteMine    = npcBot:GetAbilityByName("techies_remote_mines")
-	
 	local bottleLoc   = npcBot:FindItemSlot("item_bottle")
 	local bottle      = nil
 	local bottleSlot  = nil
@@ -78,7 +77,8 @@ function ItemUsageThink()
 	local botMaxHP    = npcBot:GetMaxHealth()
 	local currentMode = npcBot:GetActiveMode()
 	
-	local nearbyTrees = npcBot:GetNearbyTrees(1600)
+	local nearbyTrees   = npcBot:GetNearbyTrees(1600)
+	local nearbyEnemies = npcBot:GetNearbyHeroes(1600, true, BOT_MODE_NONE)
 	
 	local bountyTopRadLoc = GetRuneSpawnLocation(RUNE_BOUNTY_1)
 	local bountyBotRadLoc = GetRuneSpawnLocation(RUNE_BOUNTY_2)
@@ -167,13 +167,12 @@ function ItemUsageThink()
 		end
 	end
 	
-	if cyclone ~= nil and cyclone:IsCooldownReady() and currentMode == BOT_MODE_RETREAT then
-		if table.getn(enemies) > 0 then
-			npcBot:Action_UseAbilityOnEntity(cyclone, enemies[1])
-		end
-	end
-
-	if botMana < RemoteMine:GetManaCost() and not npcBot:HasModifier("modifier_clarity_potion") and not npcBot:IsChanneling() then
+	local baseMana = mine:GetManaCost()
+	if remote:GetManaCost() > 0 then
+		baseMana = remote:GetManaCost()
+	end 
+	
+	if botMana < baseMana and not npcBot:HasModifier("modifier_clarity_potion") and not npcBot:IsChanneling() then
 		if arcane ~= nil and arcane:IsCooldownReady() then
 			print("    Using ARCANE BOOTS")
     		npcBot:Action_UseAbility(arcane)
@@ -212,6 +211,12 @@ function ItemUsageThink()
 				npcBot:Action_UseAbility(bottle)
 			end
 		end
+	end
+	
+	if npcBot.other_mode == BOT_MODE_ROAM and npcBot:GetActiveMode() == BOT_MODE_RETREAT and cyclone ~= nil and table.getn(nearbyEnemies) > 0 then
+		local enemy = nearbyEnemies[1]
+		
+		npcBot:Action_UseAbilityOnEntity(cyclone, enemy)
 	end
 end
 

@@ -6,6 +6,7 @@ local botTeam = GetTeam()
 local botLocArray = {}
 
 function OnStart()
+	npcBot.other_mode = BOT_MODE_LANING
 	npcBot:Action_ClearActions(true)
 end
 

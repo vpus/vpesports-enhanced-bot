@@ -20,6 +20,7 @@ end
 
 function GetDesire()
 	local nearbyEnemies  = npcBot:GetNearbyHeroes(1600, true, BOT_MODE_NONE)
+	local closerEnemies  = npcBot:GetNearbyHeroes(900, true, BOT_MODE_NONE)
 	local nearbyAllies   = npcBot:GetNearbyHeroes(1000, false, BOT_MODE_NONE)
 	local nearbyTowers   = npcBot:GetNearbyTowers(1000, true)
 	local nearbyCreeps   = npcBot:GetNearbyCreeps(150, true)
@@ -35,31 +36,40 @@ function GetDesire()
 		return _G.desires[0]
 	end
 	
-	for e = 1, table.getn(nearbyEnemies) do
-		local enemy       = nearbyEnemies[e]
-		local dist        = GetUnitToUnitDistance(npcBot, enemy)
-		local enemyTarget = enemy:GetAttackTarget()
-		local isTargetted = false
-		local enemyRange  = enemy:GetAttackRange()
-		
-		if enemyTarget ~= nil then
-			isTargetted = enemyTarget:GetUnitName() == npcBot:GetUnitName()
-		end
-		
-		if dist < enemyRange or (dist > enemyRange and isTargetted) then
+	if npcBot.other_mode == BOT_MODE_ROAM then
+		if table.getn(nearbyEnemies) > 0 then
 			return _G.desires[7]
+		else
+			return _G.desires[0]
 		end
-	end
-	
-	if (botCurrentHP/botMaxHP < 0.2 and not npcBot:IsChanneling())
-    	or (damagedByCreep and #nearbyCreeps > 3) then
+	elseif table.getn(closerEnemies) > 2 then
+		return _G.desires[7]
+	else
+    	for e = 1, table.getn(nearbyEnemies) do
+    		local enemy       = nearbyEnemies[e]
+    		local dist        = GetUnitToUnitDistance(npcBot, enemy)
+    		local enemyTarget = enemy:GetAttackTarget()
+    		local isTargetted = false
+    		local enemyRange  = enemy:GetAttackRange()
+    		
+    		if enemyTarget ~= nil then
+    			isTargetted = enemyTarget:GetUnitName() == npcBot:GetUnitName()
+    		end
+    		
+    		if dist < enemyRange or (dist > enemyRange and isTargetted) then
+    			return _G.desires[7]
+    		end
+    	end
     	
-		return _G.desires[7]
+    	if (botCurrentHP/botMaxHP < 0.2 and not npcBot:IsChanneling())
+        	or (damagedByCreep and #nearbyCreeps > 3) then
+        	
+    		return _G.desires[7]
+    	end
+    	
+    	if table.getn(nearbyTowers) > 0 then
+    		return _G.desires[7]
+    	end
 	end
-	
-	if table.getn(nearbyTowers) > 0 then
-		return _G.desires[7]
-	end
-	
 	return _G.desires[0]
 end

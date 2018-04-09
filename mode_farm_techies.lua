@@ -22,6 +22,7 @@ local closestCamp = nil
 local spawnerLocs = {}
 
 function OnStart()
+	npcBot.other_mode = BOT_MODE_FARM
 	npcBot:Action_ClearActions(true)
 end
 
