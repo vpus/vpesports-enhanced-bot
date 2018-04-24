@@ -1,6 +1,10 @@
 local npcBot  = GetBot()
 local botTeam = npcBot:GetTeam()
 
+function OnStart()
+	npcBot.other_mode = BOT_MODE_SECRET_SHOP
+end
+
 function GetDesire()
 	if npcBot.secretShop then
 		return 1

@@ -1,6 +1,6 @@
 local npcBot = GetBot()
 
-local purchase = require(GetScriptDirectory() .. "/item_build_tinker");
+local purchase = require(GetScriptDirectory() .. "/item_build_techies");
 
 local itemsPurchase = purchase["items"]
 local boughtClarity = false
@@ -21,11 +21,13 @@ function ItemPurchaseThink()
 	local bottle  = nil
 	local salve   = nil
 	local boots   = nil
+	local arcane  = nil
 	
 	local clarityLoc = npcBot:FindItemSlot("item_clarity")
 	local bottleLoc  = npcBot:FindItemSlot("item_bottle")
 	local salveLoc   = npcBot:FindItemSlot("item_salve")
 	local bootsLoc   = npcBot:FindItemSlot("item_travel_boots")
+	local arcaneLoc  = npcBot:FindItemSlot("item_arcane_boots")
 	
 	if npcBot:GetItemSlotType(clarityLoc) == ITEM_SLOT_TYPE_MAIN then
 		clarity = npcBot:GetItemInSlot(clarityLoc)
@@ -46,9 +48,12 @@ function ItemPurchaseThink()
 	if npcBot:HasModifier("modifier_clarity_potion") then
 		boughtClarity = false
 	end
-
-	if boots == nil then
-    	if (botMana < npcBot:GetAbilityByName("tinker_march_of_the_machines"):GetManaCost()) and npcBot:IsAlive() then
+	if npcBot:GetItemSlotType(arcaneLoc) == ITEM_SLOT_TYPE_MAIN then
+		arcane = npcBot:GetItemInSlot(arcaneLoc)
+	end
+	
+	if arcane == nil then
+    	if (botMana < npcBot:GetAbilityByName("techies_remote_mines"):GetManaCost()) and npcBot:IsAlive() and arcane == nil then
     		if clarityCount < 4 and not boughtClarity and (bottle == nil or bottle:GetCurrentCharges() == 0) and clarity == nil and not npcBot:HasModifier("modifier_clarity_potion") and npcBot:GetItemSlotType(bootsLoc) == ITEM_SLOT_TYPE_INVALID then
         		local result = npcBot:ActionImmediate_PurchaseItem("item_clarity")
         		if result == PURCHASE_ITEM_SUCCESS then
@@ -58,14 +63,14 @@ function ItemPurchaseThink()
         	end
         end
     	
-    	if (botHP/botMaxHP < 0.2) and npcBot:IsAlive() then
-    		if not boughtSalve and salve == nil and not npcBot:HasModifier("modifier_flask_healing") then
-            	local result = npcBot:ActionImmediate_PurchaseItem("item_flask")
-            	if result == PURCHASE_ITEM_SUCCESS then
-            		boughtSalve = true
-            	end
-    		end
-    	end
+--    	if (botHP/botMaxHP < 0.2) and npcBot:IsAlive() then
+--    		if not boughtSalve and salve == nil and not npcBot:HasModifier("modifier_flask_healing") then
+--            	local result = npcBot:ActionImmediate_PurchaseItem("item_flask")
+--            	if result == PURCHASE_ITEM_SUCCESS then
+--            		boughtSalve = true
+--            	end
+--    		end
+--    	end
 	end
 
 	local itemIndex = nil
@@ -90,12 +95,6 @@ function ItemPurchaseThink()
 		local sideShopDistance   = npcBot:DistanceFromSideShop()
 		local secretShopDistance = npcBot:DistanceFromSecretShop()
 		local fountainDistance   = npcBot:DistanceFromFountain()
-		
---		print("Side Shop? " .. tostring(sideShop)
---		.. " Secret Shop? " .. tostring(secretShop)
---		.. " Side Shop Distance: " .. tostring(sideShopDistance) 
---		.. " Secret Shop Distance: " .. tostring(secretShopDistance)
---		.. " Fountain Distance: " .. tostring(fountainDistance))
 		
 		if secretShop then
 			npcBot.secretShop = true -- lets the secret shop mode know to switch

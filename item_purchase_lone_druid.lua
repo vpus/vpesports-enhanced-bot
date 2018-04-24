@@ -1,6 +1,6 @@
 local npcBot = GetBot()
 
-local purchase = require(GetScriptDirectory() .. "/item_build_tinker");
+local purchase = require(GetScriptDirectory() .. "/item_build_lone_druid");
 
 local itemsPurchase = purchase["items"]
 local boughtClarity = false
@@ -11,21 +11,26 @@ function ItemPurchaseThink()
 --	if GetGameState() ~= GAME_STATE_PRE_GAME and GetGameState() ~= GAME_STATE_GAME_IN_PROGRESS then
 --		return;
 --	end
-	
+	local bear       = false
 	local botHP      = npcBot:GetHealth()
 	local botMaxHP   = npcBot:GetMaxHealth()
 	local botMana    = npcBot:GetMana()
 	local botMaxMana = npcBot:GetMaxMana()
+	local gameTime   = DotaTime()
 	
 	local clarity = nil
 	local bottle  = nil
 	local salve   = nil
 	local boots   = nil
+	local arcane  = nil
 	
 	local clarityLoc = npcBot:FindItemSlot("item_clarity")
 	local bottleLoc  = npcBot:FindItemSlot("item_bottle")
 	local salveLoc   = npcBot:FindItemSlot("item_salve")
 	local bootsLoc   = npcBot:FindItemSlot("item_travel_boots")
+	local arcaneLoc  = npcBot:FindItemSlot("item_arcane_boots")
+	
+	local courier = GetCourier(0)
 	
 	if npcBot:GetItemSlotType(clarityLoc) == ITEM_SLOT_TYPE_MAIN then
 		clarity = npcBot:GetItemInSlot(clarityLoc)
@@ -46,26 +51,29 @@ function ItemPurchaseThink()
 	if npcBot:HasModifier("modifier_clarity_potion") then
 		boughtClarity = false
 	end
-
-	if boots == nil then
-    	if (botMana < npcBot:GetAbilityByName("tinker_march_of_the_machines"):GetManaCost()) and npcBot:IsAlive() then
+	if npcBot:GetItemSlotType(arcaneLoc) == ITEM_SLOT_TYPE_MAIN then
+		arcane = npcBot:GetItemInSlot(arcaneLoc)
+	end
+	
+	if arcane == nil then
+    	if (botMana < npcBot:GetAbilityByName("lone_druid_spirit_bear"):GetManaCost()) and npcBot:IsAlive() and arcane == nil then
     		if clarityCount < 4 and not boughtClarity and (bottle == nil or bottle:GetCurrentCharges() == 0) and clarity == nil and not npcBot:HasModifier("modifier_clarity_potion") and npcBot:GetItemSlotType(bootsLoc) == ITEM_SLOT_TYPE_INVALID then
         		local result = npcBot:ActionImmediate_PurchaseItem("item_clarity")
         		if result == PURCHASE_ITEM_SUCCESS then
         			boughtClarity = true
-        			clarityCount = clarityCount + 1
+        			clarityCount  = clarityCount + 1
         		end
         	end
         end
     	
-    	if (botHP/botMaxHP < 0.2) and npcBot:IsAlive() then
-    		if not boughtSalve and salve == nil and not npcBot:HasModifier("modifier_flask_healing") then
-            	local result = npcBot:ActionImmediate_PurchaseItem("item_flask")
-            	if result == PURCHASE_ITEM_SUCCESS then
-            		boughtSalve = true
-            	end
-    		end
-    	end
+--    	if (botHP/botMaxHP < 0.2) and npcBot:IsAlive() then
+--    		if not boughtSalve and salve == nil and not npcBot:HasModifier("modifier_flask_healing") then
+--            	local result = npcBot:ActionImmediate_PurchaseItem("item_flask")
+--            	if result == PURCHASE_ITEM_SUCCESS then
+--            		boughtSalve = true
+--            	end
+--    		end
+--    	end
 	end
 
 	local itemIndex = nil
@@ -82,51 +90,87 @@ function ItemPurchaseThink()
 	end
 	
 	local botGold  = npcBot:GetGold()
-	local itemCost = GetItemCost(itemsPurchase[itemIndex])
+	local itemName = itemsPurchase[itemIndex]
+	if string.find(itemName, "-bear") then
+		bear     = true
+		itemName = itemName:gsub("-bear", "")
+	end
+	local itemCost = GetItemCost(itemName)
 	
-	if botGold >= itemCost then
-		local sideShop           = IsItemPurchasedFromSideShop(itemsPurchase[itemIndex])
-		local secretShop         = IsItemPurchasedFromSecretShop(itemsPurchase[itemIndex])
+	if botGold >= itemCost and gameTime > -59 then
+		local sideShop           = IsItemPurchasedFromSideShop(itemName)
+		local secretShop         = IsItemPurchasedFromSecretShop(itemName)
 		local sideShopDistance   = npcBot:DistanceFromSideShop()
 		local secretShopDistance = npcBot:DistanceFromSecretShop()
 		local fountainDistance   = npcBot:DistanceFromFountain()
 		
---		print("Side Shop? " .. tostring(sideShop)
---		.. " Secret Shop? " .. tostring(secretShop)
---		.. " Side Shop Distance: " .. tostring(sideShopDistance) 
---		.. " Secret Shop Distance: " .. tostring(secretShopDistance)
---		.. " Fountain Distance: " .. tostring(fountainDistance))
-		
 		if secretShop then
 			npcBot.secretShop = true -- lets the secret shop mode know to switch
 			if secretShopDistance == 0 then
-				local result = npcBot:ActionImmediate_PurchaseItem(itemsPurchase[itemIndex])
-				print("Purchasing " .. itemsPurchase[itemIndex] .. ": " .. tostring(result))
+				local result = npcBot:ActionImmediate_PurchaseItem(itemName)
+				print("Purchasing " .. itemName .. ": " .. tostring(result))
     			if result == PURCHASE_ITEM_SUCCESS then
     				itemsPurchase[itemIndex] = "none"
+    				
+					for i = 9, 15 do
+    					local item = npcBot:GetItemInSlot(i)
+    					if item:GetName() == itemName then
+    						if bear then
+    							item.bear = true
+    						else
+    							item.bear = false
+    						end
+    					end
+    				end
     			else
-    				print("    Item Not Purchased: " .. tostring(result) .. " : " .. tostring(itemsPurchase[itemIndex]))
+    				print("    Item Not Purchased: " .. tostring(result) .. " : " .. tostring(itemName))
     			end
 			end
 		elseif not secretShop then
-			local result = npcBot:ActionImmediate_PurchaseItem(itemsPurchase[itemIndex])
-			print("Purchasing " .. itemsPurchase[itemIndex] .. ": " .. tostring(result))
+			local result = npcBot:ActionImmediate_PurchaseItem(itemName)
+			print("Purchasing " .. itemName .. ": " .. tostring(result))
 			if result == PURCHASE_ITEM_SUCCESS then
 				itemsPurchase[itemIndex] = "none"
+				
+				for i = 9, 15 do
+					local item = npcBot:GetItemInSlot(i)
+					if item ~= nil and item:GetName() == itemName then
+						if bear then
+							item.bear = true
+						else
+							item.bear = false
+						end
+					end
+				end
 			else
-				print("    Item Not Purchased: " .. tostring(result) .. " : " .. tostring(itemsPurchase[itemIndex]))
+				print("    Item Not Purchased: " .. tostring(result) .. " : " .. tostring(itemName))
 			end
 		end
 	end
 	
 	if npcBot:GetStashValue() > 0 then
-		local courier = GetCourier(0)
-		local state   = GetCourierState(courier)
+		local state = GetCourierState(courier)
 		
 		if courier ~= nil then
 			if state == COURIER_STATE_IDLE or state == COURIER_STATE_AT_BASE and npcBot:IsAlive() then
 				npcBot:ActionImmediate_Courier(courier, COURIER_ACTION_TAKE_AND_TRANSFER_ITEMS)
 			end
+		end
+	end
+	
+	for i = 0, 8 do
+		local item = npcBot:GetItemInSlot(i)
+		
+		if item ~= nil and item.bear then
+			local bearDist = GetUnitToUnitDistance(npcBot, npcBot.bear)
+			npcBot.bear.pickupitem = true
+        	npcBot.bear.item = item
+        	
+			if bearDist <= 220 then
+    			npcBot:Action_DropItem(item, npcBot:GetLocation() + RandomVector(50))	
+    		else
+    			
+    		end
 		end
 	end
 end	

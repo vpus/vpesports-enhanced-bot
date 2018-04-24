@@ -24,44 +24,55 @@ function Think()
 end
 
 function GetDesire()
-	local nearbyEnemies  = npcBot:GetNearbyHeroes(650, true, BOT_MODE_NONE)
+	local nearbyEnemies  = npcBot:GetNearbyHeroes(1600, true, BOT_MODE_NONE)
+	local nearbyEnemies  = npcBot:GetNearbyHeroes(1000, true, BOT_MODE_NONE)
 	local nearbyAllies   = npcBot:GetNearbyHeroes(1000, false, BOT_MODE_NONE)
 	local nearbyTowers   = npcBot:GetNearbyTowers(1000, true)
-	local nearbyCreeps   = npcBot:GetNearbyCreeps(150, true)
-	local currentAction  = npcBot:GetCurrentActionType()
+	local nearbyCreeps   = npcBot:GetNearbyCreeps(300, true)
+	local allyCreeps     = npcBot:GetNearbyCreeps(1600, false)
+	local action         = npcBot:GetCurrentActionType()
 	local damagedByCreep = npcBot:WasRecentlyDamagedByCreep(1)
-	local damagedByHero  = npcBot:WasRecentlyDamagedByCreep(1)
+	local damagedByHero  = npcBot:WasRecentlyDamagedByHero(1)
 	local botCurrentHP   = npcBot:GetHealth()
 	local botMaxHP       = npcBot:GetMaxHealth()
 	local botLoc         = npcBot:GetLocation()
+	local botMode        = npcBot:GetActiveMode()
 	
-	local closerEnemies  = npcBot:GetNearbyHeroes(400, true, BOT_MODE_NONE)
-	local fartherEnemies = npcBot:GetNearbyHeroes(1000, true, BOT_MODE_NONE)
-
+	if botMode == BOT_MODE_ROAM and table.getn(closerEnemies) > 0 then
+		return _G.desires[7]
+	end
+	
 	if npcBot:IsChanneling() then
 		return _G.desires[0]
 	end
 	
-	if (#fartherEnemies > 1) 
-    	or (#closerEnemies > 0) 
-    	or (#nearbyTowers > 0) 
-    	or (#nearbyEnemies > 0 and currentAction ~= BOT_ACTION_TYPE_USE_ABILITY and not npcBot:IsChanneling())
-    	or (botCurrentHP/botMaxHP < 0.2 and currentAction ~= BOT_ACTION_TYPE_USE_ABILITY and not npcBot:IsChanneling())
-    	or ((damagedByCreep and #nearbyCreeps > 3) or damagedByHero) then
-    	
-		return _G.desires[7] 
+	if table.getn(nearbyEnemies) > 0 then
+		return _G.desires[7]
 	end
 	
-	for i,enemy in ipairs(fartherEnemies) do
-		local enemyLoc   = enemy:GetLocation()
-		local enemyRange = enemy:GetAttackRange()
+	for e = 1, table.getn(nearbyEnemies) do
+		local enemy       = nearbyEnemies[e]
+		local dist        = GetUnitToUnitDistance(npcBot, enemy)
+		local enemyTarget = enemy:GetAttackTarget()
+		local isTargetted = false
 		
-		if enemyRange > 200 then
-			local dist = _G.getDistance(enemyLoc, botLoc)
-			if dist < (enemyRange + 200) then
-				return _G.desires[7]
-			end
+		if enemyTarget ~= nil then
+			isTargetted = enemyTarget:GetUnitName() == npcBot:GetUnitName()
 		end
+		
+		if dist < 500 or (dist > 500 and isTargetted) then
+			return _G.desires[7]
+		end
+	end
+	
+	if (botCurrentHP/botMaxHP < 0.2 and not npcBot:IsChanneling())
+    	or (damagedByCreep and table.getn(nearbyCreeps) > 3) then
+    	
+		return _G.desires[7]
+	end
+	
+	if table.getn(nearbyTowers) > 0 then
+		-- 
 	end
 	
 	return _G.desires[0]

@@ -595,3 +595,100 @@ function inGroup(group, point)
 	
 	return false
 end
+
+function getDesireString(mode)
+	if mode == BOT_MODE_NONE then
+		return "None"
+	elseif mode == BOT_MODE_LANING then
+		return "Laning"
+	elseif mode == BOT_MODE_ATTACK then
+		return "Attack"
+	elseif mode == BOT_MODE_RETREAT then
+		return "Retreat"
+	elseif mode == BOT_MODE_SECRET_SHOP then
+		return "Secret Shop"
+	elseif mode == BOT_MODE_SIDE_SHOP then
+		return "Side Shop"
+	elseif mode == BOT_MODE_PUSH_TOWER_TOP then
+		return "Push Top Tower"
+	elseif mode == BOT_MODE_PUSH_TOWER_MID then
+		return "Push Mid Tower"
+	elseif mode == BOT_MODE_PUSH_TOWER_BOT then
+		return "Push Bot Tower"
+	elseif mode == BOT_MODE_DEFEND_TOWER_TOP then
+		return "Defend Top Tower"
+	elseif mode == BOT_MODE_DEFEND_TOWER_MID then
+		return "Defend Mid Tower"
+	elseif mode == BOT_MODE_DEFEND_TOWER_BOT then
+		return "Defend Bot Tower"
+	elseif mode == BOT_MODE_ASSEMBLE then
+		return "Assemble"
+	elseif mode == BOT_MODE_TEAM_ROAM then
+		return "Team Roam"
+	elseif mode == BOT_MODE_FARM then
+		return "Farm"
+	elseif mode == BOT_MODE_DEFEND_ALLY then
+		return "Defend Ally"
+	elseif mode == BOT_MODE_EVASIVE_MANEUVERS then
+		return "Evasive Maneuvers"
+	elseif mode == BOT_MODE_ROSHAN then
+		return "Roshan"
+	elseif mode == BOT_MODE_ITEM then
+		return "Item"
+	elseif mode == BOT_MODE_WARD then
+		return "Ward"
+	end
+end
+
+-- Get the best target to use Hand of Midas on
+function getMidasTarget(npcBot)
+	local creeps      = npcBot:GetNearbyLaneCreeps(1600, true)
+	local neutrals    = npcBot:GetNearbyNeutralCreeps(1600, true)
+	local creepsToUse = nil
+	local target      = nil
+	
+	if table.getn(creeps) > 0 then
+		creepsToUse = creeps
+	else
+		creepsToUse = neutrals
+	end
+	
+	if table.getn(creepsToUse) > 0 then
+		target = creepsToUse[1]
+		
+		for i = 2, table.getn(creepsToUse) do
+			if target:GetMaxHealth() < creepsToUse[i]:GetMaxHealth() then
+				target = creepsToUse[i]
+			end
+		end
+	end
+	
+	return target
+end
+
+-- Returns whether it's safe to attack a tower
+function isTowerSafe(npcBot, tower)
+	local towerTarget = tower:GetAttackTarget()
+	if towerTarget == nil then
+		return false
+	end
+	local targetHP = towerTarget:GetHealth()
+	local targetMaxHP = towerTarget:GetMaxHealth()
+	local distToTower = GetUnitToUnitDistance(npcBot, tower)
+	local nearbyCreeps = tower:GetNearbyLaneCreeps(800, false)
+	
+	if targetHP / targetMaxHP <= 0.5 then
+		if table.getn(nearbyCreeps) > 0 then
+			local creepDistToTower = GetUnitToUnitDistance(nearbyCreeps[1], tower)
+			local botDistToTower   = GetUnitToUnitDistance(npcBot, tower)
+			
+			if creepDistToTower < botDistToTower then
+				return true
+			end
+		else
+			return false
+		end
+	else
+		return true
+	end
+end

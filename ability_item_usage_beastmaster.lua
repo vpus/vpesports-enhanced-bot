@@ -163,3 +163,18 @@ end
 --     -- end
     
 -- end
+
+function BuybackUsageThink()
+    if DotaTime() < -30 and lane_claim then
+        local lane_id = npcBot:GetAssignedLane()
+        if lane_id == 1 then
+            npcBot:ActionImmediate_Chat("I'm going Top!", false)
+        elseif lane_id == 2 then
+            npcBot:ActionImmediate_Chat("I'm going Mid!", false)
+        elseif lane_id == 3 then
+            npcBot:ActionImmediate_Chat("I'm going Bot!", false)
+        end
+        lane_claim = false
+    end
+    return
+end

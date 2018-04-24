@@ -44,15 +44,31 @@ function ItemPurchaseThink()
 --		.. " Fountain Distance: " .. tostring(fountainDistance))
 		
 		if secretShop then
-			npcBot.secretShop = true -- lets the secret shop mode know to switch
-			if secretShopDistance == 0 then
+			if secretShopDistance > 200000 then
+				courier = GetCourier(0)
+				state = GetCourierState(courier)
+				if courier ~= nil then
+					if state == COURIER_STATE_IDLE or state == COURIER_STATE_AT_BASE then
+						npcBot:ActionImmediate_Courier(courier, COURIER_ACTION_SECRET_SHOP)
+					end
+				end
 				local result = npcBot:ActionImmediate_PurchaseItem(itemsPurchase[itemIndex])
 				print("Purchasing " .. itemsPurchase[itemIndex] .. ": " .. tostring(result))
-    			if result == PURCHASE_ITEM_SUCCESS then
-    				itemsPurchase[itemIndex] = "none"
-    			else
-    				print("    Item Not Purchased: " .. tostring(result) .. " : " .. tostring(itemsPurchase[itemIndex]))
-    			end
+				if result == PURCHASE_ITEM_SUCCESS then
+					itemsPurchase[itemIndex] = "none"
+					npcBot:ActionImmediate_Courier(courier, COURIER_ACTION_RETURN)
+				end
+			else
+				npcBot.secretShop = true -- lets the secret shop mode know to switch
+				if secretShopDistance == 0 then
+					local result = npcBot:ActionImmediate_PurchaseItem(itemsPurchase[itemIndex])
+					print("Purchasing " .. itemsPurchase[itemIndex] .. ": " .. tostring(result))
+					if result == PURCHASE_ITEM_SUCCESS then
+						itemsPurchase[itemIndex] = "none"
+					else
+						print("    Item Not Purchased: " .. tostring(result) .. " : " .. tostring(itemsPurchase[itemIndex]))
+					end
+				end
 			end
 		elseif not secretShop then
 			local result = npcBot:ActionImmediate_PurchaseItem(itemsPurchase[itemIndex])
