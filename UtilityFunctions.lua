@@ -271,35 +271,35 @@ end
 -- The two towers at base are referenced by LANE_NONE
 -- if lane == 5, then all living towers will be returned
 function getAllTowersInLane(lane, team)
-	local towersStatus = {};
+	local towersStatus = {}
 	if lane == LANE_NONE or lane == 5 then
-		T1 = GetTower(team, _G.towers[10]);
-		T2 = GetTower(team, _G.towers[11]);
-		if T1 ~= nil then table.insert(towersStatus, T1) end;
-		if T2 ~= nil then table.insert(towersStatus, T2) end;
+		T1 = GetTower(team, TOWER_BASE_1)
+		T2 = GetTower(team, TOWER_BASE_2)
+		if T1 ~= nil then table.insert(towersStatus, T1) end
+		if T2 ~= nil then table.insert(towersStatus, T2) end
 	elseif lane == LANE_TOP or lane == 5 then
-		T1 = GetTower(team, _G.towers[1]);
-		T2 = GetTower(team, _G.towers[4]);
-		T3 = GetTower(team, _G.towers[7]);
-		if T1 ~= nil then table.insert(towersStatus, T1) end;
-		if T2 ~= nil then table.insert(towersStatus, T2) end;
-		if T3 ~= nil then table.insert(towersStatus, T3) end;
+		T1 = GetTower(team, TOWER_TOP_1)
+		T2 = GetTower(team, TOWER_TOP_2)
+		T3 = GetTower(team, TOWER_TOP_3)
+		if T1 ~= nil then table.insert(towersStatus, T1) end
+		if T2 ~= nil then table.insert(towersStatus, T2) end
+		if T3 ~= nil then table.insert(towersStatus, T3) end
 	elseif lane == LANE_MID or lane == 5 then
-		T1 = GetTower(team, _G.towers[2]);
-		T2 = GetTower(team, _G.towers[5]);
-		T3 = GetTower(team, _G.towers[8]);
-		if T1 ~= nil then table.insert(towersStatus, T1) end;
-		if T2 ~= nil then table.insert(towersStatus, T2) end;
-		if T3 ~= nil then table.insert(towersStatus, T3) end;
+		T1 = GetTower(team, TOWER_MID_1)
+		T2 = GetTower(team, TOWER_MID_2)
+		T3 = GetTower(team, TOWER_MID_3)
+		if T1 ~= nil then table.insert(towersStatus, T1) end
+		if T2 ~= nil then table.insert(towersStatus, T2) end
+		if T3 ~= nil then table.insert(towersStatus, T3) end
 	elseif lane == LANE_BOT or lane == 5 then
-		T1 = GetTower(team, _G.towers[3]);
-		T2 = GetTower(team, _G.towers[6]);
-		T3 = GetTower(team, _G.towers[9]);
-		if T1 ~= nil then table.insert(towersStatus, T1) end;
-		if T2 ~= nil then table.insert(towersStatus, T2) end;
-		if T3 ~= nil then table.insert(towersStatus, T3) end;
+		T1 = GetTower(team, TOWER_BOT_1)
+		T2 = GetTower(team, TOWER_BOT_2)
+		T3 = GetTower(team, TOWER_BOT_3)
+		if T1 ~= nil then table.insert(towersStatus, T1) end
+		if T2 ~= nil then table.insert(towersStatus, T2) end
+		if T3 ~= nil then table.insert(towersStatus, T3) end
 	end
-	return towersStatus;
+	return towersStatus
 end
 
 -- Returns the team's specific object
