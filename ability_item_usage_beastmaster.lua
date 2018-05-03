@@ -4,6 +4,7 @@ require(GetScriptDirectory().."/UtilityFunctions")
 
 local npcBot  = GetBot()
 local botTeam = GetTeam()
+local lane_claim = true
 
 function AbilityLevelUpThink()
     local skillsToLevel = build["skills"]
@@ -71,17 +72,29 @@ function AbilityUsageThink()
             end
 
             if strongerEnemy ~= nil then
-                local wildAxeLoc = _G.getVectorBetweenTargetPercentage(npcBot, strongerEnemy, 1.1)
-                print("Ability : Using Wild Axe on ", wildAxeLoc)
-                npcBot:Action_UseAbilityOnLocation(wild_axes, wildAxeLoc)
+                if botTeam == 2 then
+                    local wildAxeLoc = _G.getVectorBetweenTargetPercentage(npcBot, strongerEnemy, 1.1)
+                    print("Ability : Using Wild Axe on ", wildAxeLoc)
+                    npcBot:Action_UseAbilityOnLocation(wild_axes, wildAxeLoc)
+                else
+                    local wildAxeLoc = _G.getVectorBetweenTargetPercentage(strongerEnemy, npcBot, 1.1)
+                    print("Ability : Using Wild Axe on ", wildAxeLoc)
+                    npcBot:Action_UseAbilityOnLocation(wild_axes, wildAxeLoc)
+                end
             else
                 action_mode = npcBot:GetActiveMode()
                 if action_mode == BOT_MODE_FARM then
                     local nearbyCreeps  = npcBot:GetNearbyLaneCreeps(1000, true)
                     if #nearbyCreeps >= 3 then
-                        local wildAxeLoc = _G.getVectorBetweenTargetPercentage(npcBot, nearbyCreeps[3], 1.1)
-                        print("Ability : Using Wild Axe on ", wildAxeLoc)
-                        npcBot:ActionQueue_UseAbilityOnLocation(wild_axes, wildAxeLoc)
+                        if botTeam == 2 then
+                            local wildAxeLoc = _G.getVectorBetweenTargetPercentage(npcBot, nearbyCreeps[3], 1.1)
+                            print("Ability : Using Wild Axe on ", wildAxeLoc)
+                            npcBot:ActionQueue_UseAbilityOnLocation(wild_axes, wildAxeLoc)
+                        else
+                            local wildAxeLoc = _G.getVectorBetweenTargetPercentage(nearbyCreeps[3], npcBot, 1.1)
+                            print("Ability : Using Wild Axe on ", wildAxeLoc)
+                            npcBot:ActionQueue_UseAbilityOnLocation(wild_axes, wildAxeLoc)
+                        end
                     end
                 end
             end

@@ -55,7 +55,6 @@ function GetDesire()
 		local dist        = GetUnitToUnitDistance(npcBot, enemy)
 		local enemyTarget = enemy:GetAttackTarget()
 		local isTargetted = false
-<<<<<<< HEAD
 		
 		if enemyTarget ~= nil then
 			isTargetted = enemyTarget:GetUnitName() == npcBot:GetUnitName()
@@ -63,26 +62,7 @@ function GetDesire()
 		
 		if dist < 500 or (dist > 500 and isTargetted) then
 			return _G.desires[7]
-=======
-		
-		if enemyTarget ~= nil then
-			isTargetted = enemyTarget:GetUnitName() == npcBot:GetUnitName()
->>>>>>> 01aa975e87637c939ea9c5e2d1e3ef573c2632b1
 		end
-		
-		if dist < 500 or (dist > 500 and isTargetted) then
-			return _G.desires[7]
-		end
-	end
-	
-	if (botCurrentHP/botMaxHP < 0.2 and not npcBot:IsChanneling())
-    	or (damagedByCreep and #nearbyCreeps > 3) then
-    	
-		return _G.desires[7]
-	end
-	
-	if table.getn(nearbyTowers) > 0 then
-		-- 
 	end
 	
 	if (botCurrentHP/botMaxHP < 0.2 and not npcBot:IsChanneling())

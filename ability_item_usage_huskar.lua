@@ -4,6 +4,7 @@ require(GetScriptDirectory().."/UtilityFunctions")
 
 local npcBot  = GetBot()
 local botTeam = GetTeam()
+local lane_claim = true
 
 function AbilityLevelUpThink()
     local skillsToLevel = build["skills"]

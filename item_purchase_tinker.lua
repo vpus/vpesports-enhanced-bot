@@ -97,6 +97,9 @@ function ItemPurchaseThink()
 --		.. " Secret Shop Distance: " .. tostring(secretShopDistance)
 --		.. " Fountain Distance: " .. tostring(fountainDistance))
 		
+		if itemsPurchase[itemIndex] == "item_bottle" or itemsPurchase[itemIndex] == "item_ring_of_health" or itemsPurchase[itemIndex] == "item_void_stone" then
+			secretShop = false
+		end
 		if secretShop then
 			npcBot.secretShop = true -- lets the secret shop mode know to switch
 			if secretShopDistance == 0 then

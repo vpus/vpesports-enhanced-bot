@@ -9,8 +9,21 @@ local mine   = npcBot:GetAbilityByName("techies_land_mines")
 local stasis = npcBot:GetAbilityByName("techies_stasis_trap")
 local blast  = npcBot:GetAbilityByName("techies_suicide")
 local remote = npcBot:GetAbilityByName("techies_remote_mines")
+local lane_claim = true
 
 function BuybackUsageThink()
+    if DotaTime() < -30 and lane_claim then
+        local lane_id = npcBot:GetAssignedLane()
+        if lane_id == 1 then
+            npcBot:ActionImmediate_Chat("I'm going Top!", false)
+        elseif lane_id == 2 then
+            npcBot:ActionImmediate_Chat("I'm going Mid!", false)
+        elseif lane_id == 3 then
+            npcBot:ActionImmediate_Chat("I'm going Bot!", false)
+        end
+        lane_claim = false
+    end
+    return
 end
 
 function AbilityLevelUpThink()

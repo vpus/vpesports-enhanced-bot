@@ -149,7 +149,8 @@ off_pool = {
 	"npc_dota_hero_omniknight",
 	-- "npc_dota_hero_tiny",
 	"npc_dota_hero_underlord",
-	"npc_dota_hero_abaddon"
+	"npc_dota_hero_abaddon",
+	"npc_dota_hero_legion_commander",
 }
 support_pool = {
 	"npc_dota_hero_jakiro",
@@ -161,6 +162,7 @@ support_pool = {
 	"npc_dota_hero_lich",
 	"npc_dota_hero_lion",
 	"npc_dota_hero_techies",
+	"npc_dota_hero_ogre_magi",
 }
 -- This is the pool of heros from which to choose bots for each position
 hero_pool_position={

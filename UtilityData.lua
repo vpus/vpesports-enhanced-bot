@@ -2,6 +2,10 @@
 total_prox    = 0;
 total_remotes = 0;
 total_stasis  = 0;
+
+-- Keep a reference to each mine
+remoteMines = {};
+-- proxMines   = {};
 ------------------------------------- Final ------------------------------------
 -- Get all player IDs
 rad_player_ids = GetTeamPlayers(TEAM_RADIANT);
@@ -60,7 +64,7 @@ actions = {
 	["move_to"]     = BOT_ACTION_TYPE_MOVE_TO,
 	["attack"]      = BOT_ACTION_TYPE_ATTACK,
 	["attack_move"] = BOT_ACTION_TYPE_ATTACKMOVE,
-	["use_ability"] = BOT_ACTION_TYPE_USE_ABILITY,
+	["ability"]     = BOT_ACTION_TYPE_USE_ABILITY,
 	["pick_rune"]   = BOT_ACTION_TYPE_PICK_UP_RUNE,
 	["pick_item"]   = BOT_ACTION_TYPE_PICK_UP_ITEM,
 	["drop_item"]   = BOT_ACTION_TYPE_DROP_ITEM,
@@ -94,11 +98,11 @@ towers = {
 	TOWER_BOT_3,
 	TOWER_BASE_1,
 	TOWER_BASE_2
-};
+}
 
 rad_early_remote_locs = {
-	Vector(-6200, 3400),
-	Vector(-3200, 4400),
+	Vector(-6000, 3800),
+	Vector(-2800, 4300),
 	Vector(-900, -1200),
 	Vector(800, 500),
 	Vector(3600, 800),
@@ -145,18 +149,6 @@ dir_base_remote_locs = {
 	Vector(5300, 4300)
 };
 
-rad_base_remote_locs_attack = {
-	Vector(2600, 5700),
-	Vector(3600, 3000),
-	Vector(6300, 2000)
-}
-
-dir_base_remote_locs_attack = {
-	Vector(-6600, -2500),
-	Vector(-4000, -3400),
-	Vector(-3000, -6000)
-}
-
 rad_fountain = Vector(-6700, -6200);
 dir_fountain = Vector(6600, 6000);
 
@@ -200,7 +192,7 @@ radiant_camp_locs = {
 		Vector(-350, -3400),
 		Vector(-900, -2900),
 		3,
-		Vector(-1500, -2300),
+		Vector(-1600, -2900),
 		false
 	},
 	{
