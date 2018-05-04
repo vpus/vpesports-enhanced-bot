@@ -141,6 +141,7 @@ mid_pool = {
 	"npc_dota_hero_death_prophet",
 	"npc_dota_hero_dragon_knight",
 	"npc_dota_hero_sniper",
+  "npc_dota_hero_templar_assassin",
 }
 off_pool = {
 	"npc_dota_hero_tidehunter",

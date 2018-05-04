@@ -711,3 +711,9 @@ function isTowerSafe(npcBot, tower)
 		return true
 	end
 end
+
+-- Returns if the item is in a main slot or not and the item itself
+function getItemAvailable(itemName, bot)
+	local itemSlot = bot:FindItemSlot(itemName)
+	return (bot:GetItemSlotType(itemSlot) == ITEM_SLOT_TYPE_MAIN), bot:GetItemInSlot(itemSlot)
+end
