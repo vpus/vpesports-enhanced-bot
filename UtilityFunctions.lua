@@ -451,8 +451,8 @@ function getVectorBetweenTargetPercentage(you, target, p)
 --	
 --	return Vector(youX + a, youY + a, 0)
 
-	local locX = youX + math.abs(youX - targetX)*p
-	local locY = youY + math.abs(youY - targetY)*p
+	local locX = youX + (math.abs(youX) - math.abs(targetX))*p
+	local locY = youY + (math.abs(youY) - math.abs(targetY))*p
 	
 	return Vector(locX, locY, 0)
 end
@@ -470,8 +470,8 @@ function getVectorBetweenTargetDistance(you, target, d)
 	local dist = GetUnitToUnitDistance(you, target)
 	local p = dist/d*100
 
-	local locX = youX + math.abs(youX - targetX)*p
-	local locY = youY + math.abs(youY - targetY)*p
+	local locX = youX + (math.abs(youX) - math.abs(targetX))*p
+	local locY = youY + (math.abs(youY) - math.abs(targetY))*p
 	
 	return Vector(locX, locY, 0)
 end
